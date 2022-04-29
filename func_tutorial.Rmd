@@ -783,6 +783,21 @@ a # view the result
 
 ###
 
+We can perhaps visualise this better by printing an output on each iteration to see the process in action. Try to guess what the code below will produce, then run it to see if you were right! 
+
+```{r for-new1, exercise=TRUE}
+a <- c(0,0,0,0,0) # create a vector of zeros
+
+for (i in 1:5){ # iterate over the vector c(1,2,3), storing each item in `i`
+  
+  a[i] <- i # for each iteration, make the 'ith' item in `a` equal to `i`
+  print(a) # each time we go round the loop, print the current state of `a`
+  
+}
+```
+
+###
+
 This might not seem like such a big deal in this example, but what if `a` was 1000 items long? Try running the code below and see just how fast this is!
 
 ```{r for-3, exercise=TRUE}
