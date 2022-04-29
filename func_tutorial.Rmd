@@ -1,0 +1,1183 @@
+---
+title: 'Learning Functions for Stats'
+author: 'Sean Westwood'
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+set.seed(123) # reproducible simulation
+
+library(learnr) # load learnr package for interactive exercises
+
+# initialise global vars
+my_data <<- data.frame(
+  a = 1:5,
+  b = 6:10
+)
+```
+
+## Functions
+
+### **Welcome!!**
+
+This tutorial is designed to introduce the idea of creating your own functions in R as a way of understanding what is going on under the hood of some of the statistical tests you have been introduced to. Don't worry if this sounds scary - we will go through everything step-by-step, and you will soon see that functions are far more simple than they seem!
+
+
+### **What is a function?**
+
+You have probably used dozens of different functions in R, but have you ever thought about what they actually are? Well, in the most simple sense, a function is something that takes an **input**, does some **process** to it, and then produces an **output**. So what does this look like in R?
+
+### 
+
+Below we have an example of how to create a function in R. We use `function()` to initiate the process, and inside the brackets we put the names of the **input** variables that we want the function to take (this can be anything you want). Here we have told the function to take 2 variables, `a` and `b`, but we still need to tell the function what we want it to do with them! 
+
+```{r add_func-1, eval=FALSE}
+add_func <- function(a, b){
+  
+}
+```
+
+
+### 
+
+Now we have added in the line `c <- a + b` into the function. This is the process we want to apply on the input variables - in this case we are just adding them together and saving the result in another variable called `c`. All of the processes of the function should be contained between the two curly braces.  
+
+But we still need to tell the function what we want it to give us as the output!
+
+
+```{r add_func-2, eval=FALSE}
+add_func <- function(a, b){
+  
+  c <- a + b
+  
+}
+```
+
+
+### 
+
+Finally we have added `return()` into the function, which contains exactly what we want the function to provide as **output**. In this case, we want the function to return the value contained in the variable `c`.
+
+
+```{r add_func-3, eval=FALSE}
+add_func <- function(a, b){
+  
+  c <- a + b
+  return(c)
+  
+}
+```
+
+
+### **Your turn!**
+
+Have a go at making a similar function below! This time, instead of adding the two inputs together, we are going to multiply them. Try making the function yourself, and then run it on the inputs `2` and `5` (the answer should be 10). If you get stuck, use the above example to help you. Remember, in R, the `*` symbol is used for multiplication!
+
+```{r func-exercise-1, exercise=TRUE}
+# make 'your_function' return the product of 'a' and 'b' 
+multiply_func <- function(a, b){
+  
+  
+}
+  
+multiply_func(2,5)
+```
+
+
+```{r func-exercise-1-solution}
+# make 'your_function' return the product of 'a' and 'b' 
+multiply_func <- function(a, b){
+  
+  c <- a * b
+  return(c)
+  
+}
+  
+multiply_func(2,5)
+```
+
+### **Default Values**
+
+What if we want the function to automatically use specific inputs unless told otherwise? We can achieve this by simply adding an `=` sign when we define the function and the input variables like so:
+
+```{r add_func-4}
+subtract_func <- function(a = 5, b = 3){ 
+  
+  return(a - b) 
+  # if we prefer, we can skip the 'c' variable and 
+  # put the sum straight into return()!
+  
+}
+
+subtract_func()
+```
+
+
+Here we can see that simply by calling `subtract_func()` without specifying any inputs, the function automatically inserts the default values of `a=5` and `b=3`, giving an output of `2`. 
+
+###
+
+These can be overridden by specifying the inputs, such as: 
+
+
+```{r add_func-5}
+subtract_func <- function(a=5, b=3){ 
+  
+  return(a - b) 
+  
+}
+
+subtract_func(a=10, b=5)
+```
+
+###
+
+We can also simply put in the values without specifying the input variable, as long as they are in the correct order, such as:
+
+```{r add_func-6}
+subtract_func <- function(a=5, b=3){ 
+  
+  return(a-b) 
+  
+}
+
+subtract_func(10, 5)
+```
+
+This achieves the same result as before, but just be careful that you are definitely putting the inputs in the correct order!!
+
+### **Other types of input**
+
+Finally, let's look at a couple of different kinds of input we can use other than simple numbers. Here, we will first create a dataframe with column `a` and column `b`:
+
+```{r other_inputs-1}
+my_data <- data.frame(
+  a = 1:5, 
+  b = 6:10 
+)
+
+my_data
+```
+
+
+### 
+
+Each column is essentially a vector of 5 numbers, as shown by:
+
+```{r other_inputs-2}
+my_data$a
+```
+
+**Note**: The `$` operator simply indexes a column in a dataframe. You can think of it as saying "from the dataframe called `my_data`, take the column called `a`. We can see above that this column is just the vector c(1,2,3,4,5). 
+
+###
+
+We can now make a function that takes a dataframe as an input, for example if we wanted to add two columns together. For specifying columns within a function, we need to input their names as character strings and then *index* them using square brackets `[,]`. When indexing a dataframe like this, anything *before* the comma indicates which **rows** to take, and anything *after* the comma indicates which **columns** to take. If we want all rows or all columns, we just leave it blank as shown below: 
+
+```{r other_inputs-3}
+df_func <- function(df, col1, col2){
+  
+  # create a new dataframe with one column that contains
+  # the sum of the two input columns
+  output <- df[,col1] + df[,col2] 
+    
+  # return new_df
+  return(output)
+  
+}
+
+# show the output from adding columns 'a' and 'b' in my_data
+df_func(my_data, 'a', 'b')
+```
+
+### 
+
+Alternatively, we could design the function to take two vectors, access them from the original dataframe with `$`, and then convert them into a dataframe inside the function as follows:
+
+```{r other_inputs-4}
+df_func <- function(vec1, vec2){
+  
+  # create a new dataframe with one column that contains
+  # the sum of the two input vectors
+  output <- data.frame(summed_cols = vec1 + vec2) 
+  
+  # return new_df
+  return(output)
+  
+}
+
+# show the output from adding columns 'a' and 'b' in my_data
+df_func(my_data$a, my_data$b) 
+```
+
+The possibilities are endless, but the important thing is to understand and clearly define the **input**, **process**, and **output**!
+
+### **Dataframe Function Exercise**
+
+Last test to make sure you have understood everything! 
+
+* Build a function called `df_func` that takes one dataframe, one column, and one number as input variables. 
+* Call these input variables `df`, `col`, and `n`.
+* Make the default for `df` equal to `my_data`.
+* Make the default for `col` equal to `'b'`. 
+* Make the default for `n` equal to the number `2`. 
+* Make the function return **a copy** of the original dataframe `df`, with value `n` subtracted from each item in column `col`. 
+* Run the code and check the output produced by `df_func()` - it should be as follows: 
+
+```{r func-exercise-2-output, echo=FALSE}
+df_func <- function(df=my_data, col='b', n=2){
+  
+  df[,col] <- df[,col] - n
+  return(df)
+  
+}
+  
+df_func()
+```
+
+Remember to use the hints if you get stuck!!
+
+<p>&nbsp;</p>
+
+
+```{r func-exercise-2, exercise=TRUE}
+# your function should (by default) subtract 2 from each 
+# item in column b of my_data!
+df_func <- function(){
+  
+  
+  
+}
+  
+df_func()
+```
+
+```{r func-exercise-2-hint-1}
+df_func <- function(df=my_data, col='b', n=2){
+  
+  df[,col] <- 
+  # we might need to tell R which column we want the function to alter! 
+  
+}
+  
+df_func()
+```
+
+```{r func-exercise-2-solution}
+df_func <- function(df=my_data, col='b', n=2){
+  
+  df[,col] <- df[,col] - n 
+  # we can set the specified column to be itself minus n
+  return(df)
+  
+}
+  
+df_func()
+```
+
+Make sure your output has both columns!  
+
+### **Quick check...**
+
+We can double check that our output is correct with a simple logical test. The term 'logical' just refers to something that can have a true or false value, such as whether or not one variable is equal to another variable. Copy and paste your solution to the previous exercise, and run the code below. If it is correct, the output should be all `TRUE`. Otherwise, it will return `FALSE` (or even an error) and you might have to check your answer!!
+
+```{r logic_check, exercise=TRUE}
+# copy and paste your answer from the 'df_func' exercise to check that it works!
+df_func <- function(){
+  
+  
+  
+}
+  
+df_func() == data.frame(a = 1:5, b = 4:8)
+```
+
+```{r logic_check-solution}
+# your function should (by default) subtract 2 from each item in column b of my_data!
+df_func <- function(df=my_data, col='b', n=2){
+  
+  df[,col] <- df[,col] - n
+  return(df)
+  
+}
+  
+df_func() == data.frame(a = 1:5, b = 4:8)
+```
+
+### **Nice work!**
+
+You have grasped the basics of creating functions and completed the first section! Now it is time to expand your skills with conditionals and loops :) 
+
+## Conditionals
+
+### **What is a Conditional?**
+
+A conditional statement tells R to only execute some code **if** some condition is met. Hence, the way we do this is called  an `if` statement, which looks like this: 
+
+```{r if-1, eval=FALSE}
+if([some condition]) {
+  
+  [do this]
+  
+}
+
+```
+
+
+###
+
+
+As we can see, it looks somewhat similar to a function in that we define the condition in brackets, then put the process we want to run inside curly braces Let's look at a more fleshed out example:
+
+```{r if-2}
+# define some variables
+a <- 1
+b <- 1
+
+if(a == 1) { # IF a is equal to 1
+  
+  b <- 2 # make b equal to 2
+  
+}
+
+b # a is equal to 1, so b is now equal to 2
+```
+
+###
+
+```{r if-3}
+# define some variables
+a <- 2
+b <- 1
+
+if(a == 1) { # IF a is equal to 1
+  
+  b <- 2 # make b equal to 2
+  
+}
+
+b # a is not equal to 1, so b is still equal to 1
+```
+
+
+Here we can see in the first case that by setting `a <- 1`, the condition (a == 1) is met and the code `b <- 2` is run. When we set `a <- 2`, the condition is not met and `b <- 2` is not run. 
+
+### Logical Operators
+
+When using `if` statements, we need an input that can have a `TRUE` or `FALSE` value. This is typically referred to as a 'logical' or 'boolean' query. To make such a query, we can use **logical operators**, which create some combination of conditions that have to be met. Some common operators in R are as follows:
+
+* `==` (is equal to)
+* `!=` (is NOT equal to)
+* `>=` (is GREATER than or EQUAL to)
+* `<=` (is LESS than or EQUAL to)
+* `>` (is GREATER than)
+* `<` (is LESS than)
+* `&` (AND)
+* `|` (OR)
+* `%in%` (EXISTS WITHIN)
+
+These can be combined to make statements such as `x >= 3 & x < 9`, which would return `TRUE` if `x` is greater than or equal to 3 AND also less than 9. 
+
+
+### **Your turn!**
+
+Let's set `a` to be a vector of the numbers 1:5. Make a logical query that returns `TRUE` if `a` is greater than 5 AND does not equal 8 or 10. The output should be:
+
+
+```{r hidden-if, echo=FALSE}
+a <- 5:10
+a > 5 & a != 8 & a != 10
+```
+
+
+```{r if-exercise-1, exercise=TRUE}
+a <- 5:10
+
+# write your query below: 
+
+##########
+```
+
+```{r if-exercise-1-hint-1}
+a <- 5:10
+
+# write your query below: 
+a > 5 & a != 8 & a != 10
+
+# this is one solution, however there is perhaps a cleaner one on the next hint!
+```
+
+```{r if-exercise-1-solution}
+a <- 5:10
+
+# write your query below: 
+a > 5 & !(a %in% c(8,10))
+
+# here we used the ! operator to say 'a does NOT exist in the vector c(8,10)
+
+```
+
+###
+
+In case you did not look at the hints, check out this way of using the `!` operator. Below, we have made the statement `!(a %in% c(8,10))`, which basically means `a` does NOT exist in the vector c(8,10). This is a bit more efficient than writing a new `&` operator for every number we want to exclude. It is worth noting that the `!` 'NOT' operator can be used in this way, and that logical statements can be separated using brackets!
+
+```{r if-exercise-1-show}
+a <- 5:10
+
+# write your query below: 
+a > 5 & !(a %in% c(8,10))
+
+# here we used the ! operator to say 'a does NOT exist in the vector c(8,10)
+
+```
+
+### **Adding an 'if' statement!**
+
+Make an `if` statement below that adds 5 **if** `a` is greater than 5 OR **if** `b` is less than or equal to 5 AND greater than 3. If done correctly, the condition should be satisfied and the output should be *8*. Try changing the values of `a` and `b` and see if you can guess what the result will be!
+
+```{r if-exercise-2, exercise=TRUE}
+a <- 3
+b <- 4
+
+# write 'if' statement below:
+
+
+# view output
+a
+```
+
+
+```{r if-exercise-2-hint-1}
+a <- 3
+b <- 4
+
+# write 'if' statement below:
+
+if(a > 5 | (b <= 5 & b > 3)){
+  
+  a <- a + 5
+  
+}
+
+# view output
+a
+
+# see next hint for alternative solution!!
+```
+
+```{r if-exercise-2-solution}
+a <- 3
+b <- 4
+
+# write 'if' statement below:
+
+if(a > 5 | b %in% 4:5){ # alternative solution!!
+  
+  a <- a + 5
+  
+}
+
+# view output
+a
+```
+
+### 'else' and 'elseif'
+
+What if we want to run code if and only if a prior condition is NOT met? In this case, we can use the `else` statement, which functions as it sound: IF condition met, do one thing, ELSE do another thing. Simple, right? 
+
+Let's see how this looks in R: 
+
+```{r else-1, eval=FALSE}
+if([some condition]) {
+  
+  [do this]
+  
+} else {
+  
+  [do this]
+  
+}
+```
+
+###
+
+We can see it works in very much the same way as the if statement, by just adding on another set of curly braces. If we were to adapt our first `if` example to include an `else` statement, it would look like this: 
+
+
+```{r else-2}
+# define some variables
+a <- 2
+b <- 1
+
+if(a == 1) { # IF a is equal to 1
+  
+  b <- 2 # make b equal to 2
+  
+} else {
+  
+  b <- 3 # make b equal to 3
+  
+}
+
+b # a is not equal to 1, so the 'else' statement kicks in and b is now equal to 3
+```
+
+### 
+
+But what if we want to add a second condition that applies if the first condition is not met? In this case, we can use `else if`, which is just a combination of the first two. We can have as many `else if` statements as we require, but only one `else`, which always goes at the end and applies if none of the other conditions are met:
+
+```{r elseif-1, eval=FALSE}
+if([some condition]) {
+  
+  [do this]
+  
+} else if([some other condition]) {
+  
+  [do this]
+  
+} else if([some other condition]) {
+  
+  [do this]
+  
+} else {
+  
+  [do this]
+  
+}
+```
+
+
+### **Your turn!**
+
+Let's practice making some `else` and `else if` statements. Below, write a series of statements that:
+
+* adds 5 to `b` if `a` is less than 5 OR is equal to 10
+* adds 10 to `b` if `a` is greater than or equal to 8 but not equal to 12
+
+With the default values, the output should be 10. However, try to play around with the values and see if you can predict how much will be added to `b`!
+
+```{r elseif-exercise-1, exercise = TRUE}
+a <- 1
+b <- 5
+
+# insert statements below:
+
+
+
+b # check the output
+```
+
+```{r elseif-exercise-1-hint-1}
+a <- 1
+b <- 5
+
+# insert statements below:
+# here is the basic structure
+if(){
+  
+  b <- b +5
+  
+} else if(){
+  
+  b <- b + 10
+  
+}
+
+
+b # check the output
+```
+
+```{r elseif-exercise-1-solution}
+a <- 1
+b <- 5
+
+# insert statements below:
+# and here is the solution!
+if(a < 5 | a == 10){
+  
+  b <- b +5
+  
+} else if(a >= 8 & a != 12){
+  
+  b <- b + 10
+  
+}
+
+
+b # check the output
+```
+
+
+### **Combining Skills**
+
+Let's see if you remember what we have learned so far! Make a **function** called `combo_func()` that:
+
+* Takes 4 arguments: a dataframe called `df`, two strings called `col1` and `col2`, and finally a string called `sum_type` with a default input `'add'`. 
+* If `sum_type` is set to `'add'`, return a **vector** containing the sum of `col1` and `col2`.
+* If `sum_type` is set to `'multiply'`, return a **vector** containing the product of `col1` and `col2`.
+* If `sum_type` is set to anything else, return the number `42`. 
+
+After creating the function, we will use it to create 3 new variables:
+
+* `add_output` will be the output from `combo_func(my_data, 'a', 'b')` (remember the default for `sum_type` is `'add'`)
+* `multiply_output` will be the output from `combo_func(my_data, 'a', 'b', 'multiply')`
+* `lue_output` will be the output from `combo_func(my_data, 'a', 'b', 'life, the universe, and everything')`
+* the **final** result will be the sum of these 3 outputs, which should be as follows: 
+
+```{r hidden_combo_result}
+c(55, 65, 77, 91, 107)
+```
+
+
+```{r combo-exercise, exercise = TRUE}
+# create function here:
+combo_func <- 
+  
+  
+
+# apply function here: 
+add_output <-
+multiply_output <-
+lue_output <- 
+  
+# final result: 
+add_output + multiply_output + lue_output
+```
+
+
+```{r combo-exercise-hint-1}
+# here is the 'skeleton' for the function and conditionals
+combo_func <- function(df, col1, col2, sum_type = 'add'){
+  
+  if(sum_type == 'add'){
+    
+    
+    
+  } else if(sum_type == 'multiply'){
+    
+    
+    
+  } else {
+    
+    
+    
+  }
+  
+}
+  
+
+# apply function here: 
+add_output <- combo_func(my_data, 'a', 'b')
+multiply_output <- combo_func(my_data, 'a', 'b', 'multiply')
+lue_output <- combo_func(my_data, 'a', 'b', 'life, the universe, and everything')
+  
+# final result: 
+add_output + multiply_output + lue_output
+```
+
+
+```{r combo-exercise-hint-2}
+# here is the first part done for you
+combo_func <- function(df, col1, col2, sum_type = 'add'){
+  
+  if(sum_type == 'add'){
+    
+    add_df <- df[,col1] + df[,col2] 
+    return(add_df) # this could also be done as `add_df[,1]`
+    # remember we need to extract the col as a vector!
+    
+  } else if(sum_type == 'multiply'){
+    
+    
+    
+  } else {
+    
+    
+    
+  }
+  
+}
+  
+
+# apply function here: 
+add_output <- combo_func(my_data, 'a', 'b')
+multiply_output <- combo_func(my_data, 'a', 'b', 'multiply')
+lue_output <- combo_func(my_data, 'a', 'b', 'life, the universe, and everything')
+  
+# final result: 
+add_output + multiply_output + lue_output
+```
+
+```{r combo-exercise-solution}
+# here is the full answer
+combo_func <- function(df, col1, col2, sum_type = 'add'){
+  
+  if(sum_type == 'add'){
+    
+    add_output <- df[,col1] + df[,col2]
+    return(add_output) 
+    
+  } else if(sum_type == 'multiply'){
+    
+    multiply_output <- df[,col1] * df[,col2]
+    return(multiply_output) 
+    
+  } else {
+    
+    return(42)
+    
+  }
+  
+}
+  
+
+# apply function here: 
+add_output <- combo_func(my_data, 'a', 'b')
+multiply_output <- combo_func(my_data, 'a', 'b', 'multiply')
+lue_output <- combo_func(my_data, 'a', 'b', 'life, the universe, and everything')
+  
+# final result: 
+add_output + multiply_output + lue_output
+```
+### **WELL DONE!**
+
+You have completed the conditional section and are ready to move onto loops. You are making great progress!!
+
+## Loops
+
+### **What is a loop?**
+
+A loop is a feature of programming that allows us to perform a similar action many, many times automatically, without having to rewrite the code for each iteration. The most common loop is the `for` loop, which iterates over a series of items and performs some process each time. By 'iterate' we just mean go through the same thing a number of times. To explain this more clearly, let's look at an example:
+
+```{r for-1}
+a <- c(0,0,0) # create a vector of zeros
+
+for (i in 1:3){ # iterate over the vector c(1,2,3), storing each item in `i`
+  
+  a[i] <- i # for each iteration, make the 'ith' item in `a` equal to `i`
+  
+}
+
+a # view the result
+```
+
+###
+
+So what is going on here? Well, we iterated over the items in c(1,2,3), meaning that on each iteration, the variable `i` is set to a different number in c(1,2,3). The first time it loops round, `i` is set to the first item, which is 1. The second time, `i` is set to the second item (2), and the third time it is set to the third item (3). So essentially, the following process occurred:
+
+```{r for-2}
+a <- c(0,0,0) # create a vector of zeros
+
+  a[1] <- 1 
+  a[2] <- 2
+  a[3] <- 3
+
+a # view the result
+```
+
+###
+
+This might not seem like such a big deal in this example, but what if `a` was 1000 items long? Try running the code below and see just how fast this is!
+
+```{r for-3, exercise=TRUE}
+a <- rep(0, 1000) # create a vector of zeros
+
+for (i in 1:1000){ # iterate over a list from 1 to 1000
+  
+  a[i] <- i # for each iteration, make the 'ith' item in `a` equal to `i`
+  
+}
+
+a[991:1000] # view the last 10 items of the result
+```
+
+###
+
+Quite a lot quicker than typing everything out! We can even iterate over things other than a list of numbers, and we can also call `i` anything we want. Although, bear in mind that we can no longer use it to index if it becomes something other than regular numbers. 
+
+```{r for-4}
+a <- c() # create a blank vector
+
+for (banana in c('cat', 'dog', 7)){ # iterate over some items, storing each item in `banana` 
+  
+  a <- c(a, banana) # for each iteration, add `banana` on to the end of `a`
+  
+}
+
+a # view the result
+```
+
+###
+
+In cases like these, it is sometimes useful to add a counter variable that keeps track of the iteration number - this would allow us to index based on iterations as follows:
+
+```{r for-5}
+a <- c() # create a blank vector
+n <- 0
+
+for (banana in c('cat', 'dog', 7)){ # iterate over some items, storing each item in `banana` 
+  
+  n <- n + 1 # add 1 to the counter at the start of the loop
+  a[n] <- banana # for each iteration, add `banana` on to the end of `a`
+  
+}
+
+a # view the result
+```
+
+### **Your turn!**
+
+* Make a `for` loop that iterates `i` over the vector c(3,2,4,5).
+* Use a counter `n` to keep track of the loop number
+* On each iteration, add the contents of `i` to the 'nth' item in `a`. 
+
+The result should be as follows: 
+
+```{r hidden-for, echo=FALSE}
+c(4,4,7,9)
+```
+
+
+```{r for_exercise-1, exercise=TRUE}
+a <- 1:4
+
+
+# write for loop below
+for 
+
+a # view the result
+```
+
+```{r for_exercise-1-solution}
+a <- 1:4
+n <- 0
+
+# write for loop below
+for(i in c(3,2,4,5)){
+  
+  n <- n + 1
+  a[n] <- a[n] + i
+  
+}
+
+a # view the result
+```
+
+### **Bringing it all together!**
+
+Let's see if you have remembered everything we have covered so far! Make a function called `final_func()` that: 
+* Takes 4 arguments: a dataframe called `df`, two strings called `col1` and `col2`, a logical (`TRUE` or `FALSE`) called `miss3` with default set as `FALSE`.
+* If `miss3=FALSE`, return the sum of `col1` and `col2`.
+* If `miss3=TRUE`, add `col2` onto `col1` **EXCEPT for rows where `col1` is equal to 3**, and return the new values in `col1`.   
+
+The resulting output should be as follows:
+```{r hidden-final, echo=FALSE}
+c(7,9,3,13,15)
+```
+
+As functions get more complex, there are often many different ways to achieve the same thing. Try to plan out exactly what order things should happen and how to 'phrase' your conditionals to make the function as efficient as possible. It can also be useful to test out different inputs and different cases to make sure that the function doesn't just work in one situation! If you get stuck, use the hints to guide you :)
+
+```{r final_exercise, exercise=TRUE}
+final_func <- function(){
+  
+  
+}
+```
+
+```{r final_exercise-hint-1}
+# here is an idea for starting the structure
+final_func <- function(df, col1, col2, miss3=FALSE){
+  
+  if (){
+    return()
+    
+  } else {
+    
+    
+    return()
+  }
+}
+
+# get result
+final_func(my_data, 'a', 'b', TRUE)
+```
+
+```{r final_exercise-hint-2}
+# here is an idea for the first if statement, and where the loop might go
+final_func <- function(df, col1, col2, miss3=FALSE){
+  
+  if (miss3==FALSE){
+    return()
+    
+  } else {
+    
+    for(){
+
+      } 
+    
+    return()
+  }
+}
+
+# get result
+final_func(my_data, 'a', 'b', TRUE)
+```
+
+```{r final_exercise-hint-3}
+# here is an idea for the loop contents - next hint shows full solution!
+final_func <- function(df, col1, col2, miss3=FALSE){
+  
+  if (miss3==FALSE){
+    return()
+    
+  } else {
+    n = 0 # you might need a counter!
+    
+    for(i in df[,col1]){ 
+      n = n+1 
+      if(){
+        
+      }
+    } 
+    
+    return()
+  }
+}
+
+# get result
+final_func(my_data, 'a', 'b', TRUE)
+```
+
+
+```{r final_exercise-solution}
+final_func <- function(df, col1, col2, miss3=FALSE){
+  
+  if (miss3==FALSE){
+    return(df[,col1] + df[,col2])
+    
+  } else {
+    n = 0
+    
+    for(i in df[,col1]){
+      n = n+1
+      if(i!=3){
+        df[n,col1] <- i + df[n,col2]
+      } 
+    } 
+    
+    return(df[,col1])
+  }
+}
+
+# get result
+final_func(my_data, 'a', 'b', TRUE)
+```
+
+### **Outstanding!**
+
+You have now learnt all of the basic skills you need to start replicating statistical functions in R! There are of course more tools that you can learn, such as functional programming with `lapply()` or `map()`, but for now we are ready to try and apply what we have learned in some more practical examples. 
+
+
+
+## Variance
+
+### **What is variance?**
+
+Variance is a measure of how dispersed the data are within a distribution. Specifically, it reflects the average squared distance to the mean of the distribution. If that sounds complicated, this section should hopefully make the idea feel very intuitive by the end!  
+
+###
+
+```{r hidden-var-graph, echo=FALSE}
+x <- seq(0,10,length=1000)
+probability <- dnorm(x,5,0.5)
+y <- dnorm(x,5,1)
+z <- dnorm(x,5,1.5)
+
+plot(x, probability, type='l', col = 'skyblue', lwd = 2, bty = 'n', xaxt = 'n', yaxt = 'n', ann = FALSE)
+lines(x, y, type='l', col = 'royalblue', lwd = 2)
+lines(x, z, type='l', col = 'violet', lwd = 2)
+abline(v=5, lty=2)
+
+```
+<p>&nbsp;</p>
+
+Here we can see three different distributions with the same mean. The flatter and wider the curve, the higher the variance. If we were to choose a random point on the flattest curve, we would expect the distance to the mean to be higher than if we were to choose a random point on the steepest curve. 
+
+But how do we quantify this precisely?
+
+
+### **The Variance Formula**
+
+To calculate variance, all we need to do is find the distance to the mean for each data point, square it, add all of these together and then divide by one less than the total number of data points. In equation form, this looks like: 
+
+$$
+S^2 = \frac{\sum_{i=1}^{n}(x_i - \bar{x})^2}{n-1}
+$$
+**where:** $S^2$ = the variance, $x$ = some distribution of values (e.g. c(1,2,3,4,5)), $\bar{x}$ = the mean of those values, and $n$ = the number of values in $x$.
+<p>&nbsp;</p>
+
+
+The $\sum_{i=1}^{n}$ summation symbol essentially means 'add up everything after this symbol'. It acts kind of like a for loop - it is saying that we should loop through each item of $x$ (i = 1:$n$), each time subtracting the mean ($\bar{x}$) and squaring the result, and then at the end we should add up all of those numbers to get a final total. 
+
+Then we take that final total, divide by $n$-1 and bam! We have variance!
+
+
+### **Equations in R**
+
+You might be wondering how we convert such a tricky looking equation into R. Well, R is capable of doing pretty much any mathematical operation a calculator can do - you just need to know some of the notation. You are probably already familiar with most of it, but here are some of the key things that might help:
+
+* `x + 1` = x plus one
+* `x - 1` = x minus one
+* `x * 1` = x times one
+* `x / 1` = x divided by one
+* `x^2` = x squared (specifically x to the power of 2)
+* `x^0.5` = the square root of x (specifically x to the power of 0.5)
+
+When building an equation, remember Brackets over Division, Multiplication, Addition and Subtraction (BODMAS)! It is often useful to use brackets to break up the equation for readability and to make sure you don't make a mistake!
+
+### **Make your own variance function!**
+
+We now know everything that we need to make a variance function in R - it is time to jump into the deep end! In the exercise below, try to build a function that takes a vector input `x` and returns the variance of that vector. 
+
+We can test this on column 'a' of `my_data` - **if we are successful, the results should be equal to that given by the** `var()` **function!** If you get stuck you can check the hints, but try to use your problem-solving skills alongside what we have learned so far to figure it out on your own!
+
+```{r var-exercise, exercise=TRUE}
+my_var <- function(x){
+  
+}
+
+my_var(my_data$a) == var(my_data$a)
+```
+
+```{r var-exercise-hint-1}
+# we first need to define the mean (u), as well as number of values (n)
+my_var <- function(x){
+  
+  n <- 
+  u <- 
+  
+}
+
+my_var(my_data$a) == var(my_data$a)
+```
+
+```{r var-exercise-hint-2}
+# we are going to need a for loop! It might be useful to make a new variable to store the variance
+my_var <- function(x){
+  
+  n <- length(x)
+  u <- mean(x)
+  tmp_var <- 0
+  
+  for(){
+    
+  }
+  
+}
+
+my_var(my_data$a) == var(my_data$a)
+```
+
+```{r var-exercise-hint-3}
+# we need to iterate through the items in x
+my_var <- function(x){
+  
+  n <- length(x)
+  u <- mean(x)
+  tmp_var <- 0
+  
+  for(i in x){
+
+  }
+  
+}
+
+my_var(my_data$a) == var(my_data$a)
+```
+
+```{r var-exercise-hint-4}
+# each iteration needs to add the new result onto tmp_var
+my_var <- function(x){
+  
+  n <- length(x)
+  u <- mean(x)
+  tmp_var <- 0
+  
+  for(i in x){
+    tmp_var <- tmp_var +
+  }
+  
+
+}
+
+my_var(my_data$a) == var(my_data$a)
+```
+
+```{r var-exercise-hint-5}
+# this is the top half of the equation - we need to subtract u from x[i] and square it
+my_var <- function(x){
+  
+  n <- length(x)
+  u <- mean(x) 
+  tmp_var <- 0
+  
+  for(i in x){
+    tmp_var <- tmp_var + (i - u)^2
+  }
+  
+
+}
+
+my_var(my_data$a) == var(my_data$a)
+```
+
+```{r var-exercise-solution}
+# the final step! we now divide tmp_var by (n-1) and return the result
+my_var <- function(x){
+  
+  n <- length(x)
+  u <- mean(x)
+  tmp_var <- 0
+  
+  for(i in x){
+    tmp_var <- tmp_var + (i - u)^2
+  }
+  
+  variance <- tmp_var / (n-1)
+  return(variance)
+}
+
+my_var(my_data$a) == var(my_data$a)
+```
+
+### **Outstanding!**
+
+You have just made your first real, useful function! Now time for a bigger challenge - can we make our own t-test function??
+
+
+
+## t-test
+
+### **The Normal Distribution**
+
+**THIS SECTION IS IN PROGRESS**
+
+You probably already have a good idea what a normal - or 'Gaussian' - distribution looks like. In fact, we saw 3 already in the variance section! 
+
+### **The t-Distribution**
+
+### **The t Formula**
+
+
+
+
+
+
+
+
